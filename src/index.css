@@ -14,3 +14,7 @@ html, body {
 #zmmtg-root {
   display: none;
 }
+
+textarea.chat-box__chat-textarea {
+  font-size: 16px !important;
+}
