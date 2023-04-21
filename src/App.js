@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import "./App.css";
 import { ZoomMtg } from "@zoomus/websdk";
+const KJUR = require('jsrsasign')
 
 ZoomMtg.setZoomJSLib("https://source.zoom.us/2.11.0/lib", "/av");
 
@@ -12,32 +13,37 @@ ZoomMtg.i18n.load("en-US");
 ZoomMtg.i18n.reload("en-US");
 
 function App() {
-  let sdkKey = "YLKpNroRGaDxP22Xk9SQg";
-  let leaveUrl = "https://www.sugarfit.com/";
+  const sdkKey = process.env.REACT_APP_ZOOM_MEETING_SDK_KEY;
+  const sdks = process.env.REACT_APP_ZOOM_MEETING_SDK_SECRET;
+  const leaveUrl = "https://www.sugarfit.com/";
 
-  const [name, setName] = useState("");
-  const [meetNumber, setMeetNumber] = useState("");
-  const [password, setpw] = useState("");
-  const [jwt, setJWT] = useState("");
-  const [err] = useState("");
+  function getSignature(m, p, n) {
+    const iat = Math.round(new Date().getTime() / 1000) - 30;
+    const exp = iat + 60 * 60 * 2;
 
-  // function getSignature(e) {
-  //   e.preventDefault();
+    const oHeader = { alg: "HS256", typ: "JWT" };
 
-  //   fetch(authEndpoint, {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({
-  //       meetingNumber: meetingNumber,
-  //       role: role
-  //     })
-  //   }).then(res => res.json())
-  //   .then(response => {
-  //     startMeeting(response.signature)
-  //   }).catch(error => {
-  //     console.error(error)
-  //   })
-  // }
+    const oPayload = {
+      sdkKey,
+      mn: m,
+      role: 0,
+      iat: iat,
+      exp: exp,
+      appKey: sdks,
+      tokenExp: iat + 60 * 60 * 2,
+    };
+
+    const sHeader = JSON.stringify(oHeader);
+    const sPayload = JSON.stringify(oPayload);
+    const signature = KJUR.jws.JWS.sign(
+      "HS256",
+      sHeader,
+      sPayload,
+      sdks
+    );
+
+    startMeeting(signature, m, p, n)
+  }
 
   function startMeeting(s, m, p, n) {
     document.getElementById("zmmtg-root").style.display = "block";
@@ -48,7 +54,6 @@ function App() {
         console.log(success);
 
         ZoomMtg.join({
-          // signature: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZGtLZXkiOiJZTEtwTnJvUkdhRHhQMjJYazlTUWciLCJtbiI6Ijk2Mjg2OTM2ODY0Iiwicm9sZSI6MCwiaWF0IjoxNjgxOTg2NjI1LCJleHAiOjE2ODE5OTM4MjUsImFwcEtleSI6IllMS3BOcm9SR2FEeFAyMlhrOVNRZyIsInRva2VuRXhwIjoxNjgxOTkzODI1fQ.yK-dfflU_iCWyUFs0wJk2H8m-oS8KraOT3Uu0PiJYVc",
           signature: s,
           sdkKey: sdkKey,
           meetingNumber: m,
@@ -72,7 +77,8 @@ function App() {
     let meetingArgs = Object.fromEntries(
       new URLSearchParams(window.location.search)
     );
-    meetingArgs.p && startMeeting(meetingArgs.s, meetingArgs.m, meetingArgs.p, meetingArgs.n)
+    meetingArgs.p &&
+    getSignature(meetingArgs.m, meetingArgs.p, meetingArgs.n);
   }, []);
 
   return (
