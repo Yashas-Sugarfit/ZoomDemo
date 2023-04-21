@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import "./App.css";
 import { ZoomMtg } from "@zoomus/websdk";
@@ -39,7 +39,7 @@ function App() {
   //   })
   // }
 
-  function startMeeting() {
+  function startMeeting(s, m, p, n) {
     document.getElementById("zmmtg-root").style.display = "block";
 
     ZoomMtg.init({
@@ -49,11 +49,11 @@ function App() {
 
         ZoomMtg.join({
           // signature: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZGtLZXkiOiJZTEtwTnJvUkdhRHhQMjJYazlTUWciLCJtbiI6Ijk2Mjg2OTM2ODY0Iiwicm9sZSI6MCwiaWF0IjoxNjgxOTg2NjI1LCJleHAiOjE2ODE5OTM4MjUsImFwcEtleSI6IllMS3BOcm9SR2FEeFAyMlhrOVNRZyIsInRva2VuRXhwIjoxNjgxOTkzODI1fQ.yK-dfflU_iCWyUFs0wJk2H8m-oS8KraOT3Uu0PiJYVc",
-          signature: jwt,
+          signature: s,
           sdkKey: sdkKey,
-          meetingNumber: meetNumber,
-          passWord: password,
-          userName: name,
+          meetingNumber: m,
+          passWord: p,
+          userName: n,
           success: (success) => {
             console.log(success);
           },
@@ -67,6 +67,13 @@ function App() {
       },
     });
   }
+
+  useEffect(() => {
+    let meetingArgs = Object.fromEntries(
+      new URLSearchParams(window.location.search)
+    );
+    meetingArgs.p && startMeeting(meetingArgs.s, meetingArgs.m, meetingArgs.p, meetingArgs.n)
+  }, []);
 
   return (
     <div className="App">
@@ -85,48 +92,7 @@ function App() {
           textAlign: "center",
         }}
       >
-        <h1>Zoom Meeting SDK</h1>
-
-        <input
-          placeholder="ENTER Name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <input
-          placeholder="ENTER Meeting Number"
-          type="text"
-          value={meetNumber}
-          onChange={(e) => setMeetNumber(e.target.value)}
-        />
-        <input
-          placeholder="ENTER Meeting Passcode"
-          type="text"
-          value={password}
-          onChange={(e) => setpw(e.target.value)}
-        />
-
-        <input
-          placeholder="ENTER JWT"
-          type="text"
-          value={jwt}
-          onChange={(e) => setJWT(e.target.value)}
-        />
-
-        <button
-          style={{
-            background: "white",
-            color: "black",
-            border: "1px solid black",
-            padding: "1rem",
-          }}
-          onClick={startMeeting}
-        >
-          Join Meeting
-        </button>
-
-        {err && <p style={{ color: "tomato" }}>{err}</p>}
+        <h1>Zoom Meeting</h1>
       </main>
     </div>
   );
