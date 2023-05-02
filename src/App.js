@@ -71,7 +71,8 @@ function App() {
   const handleJoinWithZoomApp = (meetingNumber, meetingPassword, name) => {
     const userAgent = navigator.userAgent.toLowerCase();
     if (userAgent.indexOf("android") > -1) {
-      window.location.href = `intent://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}#Intent;scheme=zoommtg;package=us.zoom.videomeetings;end`;
+      window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0`;
+      // window.location.href = `intent://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}#Intent;scheme=zoommtg;package=us.zoom.videomeetings;end`;
 
       setTimeout(function () {
         if (!document.hidden) {
