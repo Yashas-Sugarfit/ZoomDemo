@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import "./App.css";
 import { ZoomMtg } from "@zoomus/websdk";
-const KJUR = require('jsrsasign')
+const KJUR = require("jsrsasign");
 
 ZoomMtg.setZoomJSLib("https://source.zoom.us/2.11.0/lib", "/av");
 
@@ -35,14 +35,9 @@ function App() {
 
     const sHeader = JSON.stringify(oHeader);
     const sPayload = JSON.stringify(oPayload);
-    const signature = KJUR.jws.JWS.sign(
-      "HS256",
-      sHeader,
-      sPayload,
-      sdks
-    );
+    const signature = KJUR.jws.JWS.sign("HS256", sHeader, sPayload, sdks);
 
-    startMeeting(signature, m, p, n)
+    startMeeting(signature, m, p, n);
   }
 
   function startMeeting(s, m, p, n) {
@@ -73,12 +68,38 @@ function App() {
     });
   }
 
+  const handleJoinWithZoomApp = (meetingNumber, meetingPassword, name) => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.indexOf("android") > -1) {
+      window.location.href = `intent://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}#Intent;scheme=zoommtg;package=us.zoom.videomeetings;end`;
+
+      setTimeout(function () {
+        if (!document.hidden) {
+          // App is no longer running in the foreground, so redirect to fallback URL
+          window.location.href = "https://www.sugarfit.com/";
+        }
+      }, 2000);
+    } else if (userAgent.indexOf("iphone") > -1) {
+      window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0`;
+      setTimeout(function () {
+        if (!document.hidden) {
+          // App is no longer running in the foreground, so redirect to fallback URL
+          window.location.href = "https://www.sugarfit.com/";
+        }
+      }, 2000);
+    } else {
+      // Fallback to the Zoom Web SDK to join the meeting in the browser
+      // window.location.href = `https://zoom.us/wc/${meetingNumber}/join?prefer=1&pwd=${meetingPassword}`;
+      getSignature(meetingNumber, meetingPassword, name);
+    }
+  };
+
   useEffect(() => {
     let meetingArgs = Object.fromEntries(
       new URLSearchParams(window.location.search)
     );
     meetingArgs.p &&
-    getSignature(meetingArgs.m, meetingArgs.p, meetingArgs.n);
+      handleJoinWithZoomApp(meetingArgs.m, meetingArgs.p, meetingArgs.n);
   }, []);
 
   return (
