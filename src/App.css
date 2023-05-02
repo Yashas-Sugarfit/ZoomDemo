@@ -23,3 +23,7 @@ main button {
 main button:hover {
   background-color: #2681F2;
 }
+
+div#chat-window {
+  height: 70vh !important;
+}

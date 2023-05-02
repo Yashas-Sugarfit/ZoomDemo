@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import "./App.css";
 import { ZoomMtg } from "@zoomus/websdk";
@@ -16,6 +16,9 @@ function App() {
   const sdkKey = process.env.REACT_APP_ZOOM_MEETING_SDK_KEY;
   const sdks = process.env.REACT_APP_ZOOM_MEETING_SDK_SECRET;
   const leaveUrl = "https://www.sugarfit.com/";
+
+  const [triedOpeningZoom, setTriedOpeningZoom] = useState(false);
+  const [meetingInfo, setMeetingInfo] = useState(null);
 
   function getSignature(m, p, n) {
     const iat = Math.round(new Date().getTime() / 1000) - 30;
@@ -75,18 +78,12 @@ function App() {
       // window.location.href = `intent://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}#Intent;scheme=zoommtg;package=us.zoom.videomeetings;end`;
 
       setTimeout(function () {
-        if (!document.hidden) {
-          // App is no longer running in the foreground, so redirect to fallback URL
-          window.location.href = "https://www.sugarfit.com/";
-        }
+        setTriedOpeningZoom(true);
       }, 2000);
     } else if (userAgent.indexOf("iphone") > -1) {
       window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0`;
       setTimeout(function () {
-        if (!document.hidden) {
-          // App is no longer running in the foreground, so redirect to fallback URL
-          window.location.href = "https://www.sugarfit.com/";
-        }
+        setTriedOpeningZoom(true);
       }, 2000);
     } else {
       // Fallback to the Zoom Web SDK to join the meeting in the browser
@@ -99,9 +96,16 @@ function App() {
     let meetingArgs = Object.fromEntries(
       new URLSearchParams(window.location.search)
     );
+    setMeetingInfo(meetingArgs);
     meetingArgs.p &&
       handleJoinWithZoomApp(meetingArgs.m, meetingArgs.p, meetingArgs.n);
   }, []);
+
+  const handleJoinMeeting = () => {
+    if (!meetingInfo) return;
+
+    getSignature(meetingInfo.m, meetingInfo.p, meetingInfo.n);
+  };
 
   return (
     <div className="App">
@@ -120,7 +124,14 @@ function App() {
           textAlign: "center",
         }}
       >
-        <h1>Zoom Meeting</h1>
+        {triedOpeningZoom && (
+          <>
+            <h1>Sugarfit Webinar!</h1>
+            <button onClick={handleJoinMeeting} className="btn-zoom-demo">
+              Join Here!
+            </button>
+          </>
+        )}
       </main>
     </div>
   );
