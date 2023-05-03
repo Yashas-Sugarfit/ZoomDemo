@@ -109,7 +109,8 @@ function App() {
     } else {
       // Fallback to the Zoom Web SDK to join the meeting in the browser
       // window.location.href = `https://zoom.us/wc/${meetingNumber}/join?prefer=1&pwd=${meetingPassword}`;
-      getSignature(meetingNumber, meetingPassword, name);
+      // Join meeting only if name is provided
+      name && getSignature(meetingNumber, meetingPassword, name);
     }
   };
 
