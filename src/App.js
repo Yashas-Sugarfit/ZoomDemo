@@ -57,11 +57,6 @@ function App() {
           meetingNumber: m,
           passWord: p,
           userName: n,
-          userInfo: {
-            customData: {
-              phone: String(meetingInfo?.phone),
-            },
-          },
           success: (success) => {
             try {
               api.post("v2/chroniccare/sns-event", {
@@ -110,6 +105,7 @@ function App() {
       // Fallback to the Zoom Web SDK to join the meeting in the browser
       // window.location.href = `https://zoom.us/wc/${meetingNumber}/join?prefer=1&pwd=${meetingPassword}`;
       // Join meeting only if name is provided
+      setTriedOpeningZoom(true);
       name && getSignature(meetingNumber, meetingPassword, name);
     }
   };
