@@ -22,7 +22,7 @@ function App() {
   const [meetingInfo, setMeetingInfo] = useState(null);
   const [error, setError] = useState(null);
 
-  function getSignature(m, p, n) {
+  function getSignature(m, p, n, phone) {
     const iat = Math.round(new Date().getTime() / 1000) - 30;
     const exp = iat + 60 * 60 * 2;
 
@@ -42,10 +42,10 @@ function App() {
     const sPayload = JSON.stringify(oPayload);
     const signature = KJUR.jws.JWS.sign("HS256", sHeader, sPayload, sdks);
 
-    startMeeting(signature, m, p, n);
+    startMeeting(signature, m, p, n, phone);
   }
 
-  function startMeeting(s, m, p, n) {
+  function startMeeting(s, m, p, n, phone) {
     document.getElementById("zmmtg-root").style.display = "block";
 
     ZoomMtg.init({
@@ -62,7 +62,7 @@ function App() {
               api.post("v2/chroniccare/sns-event", {
                 eventType: "ZOOM_WEBINAR_ATTENDANCE",
                 attributes: {
-                  phoneNumber: String(meetingInfo?.phone),
+                  phoneNumber: phone,
                   time: Date.now(),
                   meetingNumber: m,
                   userName: n,
@@ -83,7 +83,12 @@ function App() {
     });
   }
 
-  const handleJoinWithZoomApp = (meetingNumber, meetingPassword, name) => {
+  const handleJoinWithZoomApp = (
+    meetingNumber,
+    meetingPassword,
+    name,
+    phone
+  ) => {
     const userAgent = navigator.userAgent.toLowerCase();
     if (userAgent.indexOf("android") > -1) {
       window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0${
@@ -106,7 +111,7 @@ function App() {
       // window.location.href = `https://zoom.us/wc/${meetingNumber}/join?prefer=1&pwd=${meetingPassword}`;
       // Join meeting only if name is provided
       setTriedOpeningZoom(true);
-      name && getSignature(meetingNumber, meetingPassword, name);
+      name && getSignature(meetingNumber, meetingPassword, name, phone);
     }
   };
 
@@ -116,7 +121,12 @@ function App() {
     );
     setMeetingInfo(meetingArgs);
     meetingArgs.p &&
-      handleJoinWithZoomApp(meetingArgs.m, meetingArgs.p, meetingArgs.n);
+      handleJoinWithZoomApp(
+        meetingArgs.m,
+        meetingArgs.p,
+        meetingArgs.n,
+        meetingArgs.phone
+      );
   }, []);
 
   const handleJoinMeeting = () => {
