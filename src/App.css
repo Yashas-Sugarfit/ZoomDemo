@@ -20,10 +20,38 @@ main button {
   outline: none;
 }
 
-main button:hover {
-  background-color: #2681F2;
-}
-
 div#chat-window {
   height: 70vh !important;
+}
+
+.name-input {
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px 20px;
+}
+
+.name-input input {
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  padding: 5px 0px;
+  outline: none;
+  border-bottom: 1px solid #e4b6ff;
+}
+
+.name-input label {
+  font-size: small;
+  font-weight: bold;
+}
+
+.name-input input::placeholder {
+  color: #d3d3d3;
+}
+
+.error-msg {
+  font-size: small;
+  font-style: italic;
+  color: rgb(255, 155, 155);
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import "./App.css";
 import { ZoomMtg } from "@zoomus/websdk";
+import api from "./utils/api";
 const KJUR = require("jsrsasign");
 
 ZoomMtg.setZoomJSLib("https://source.zoom.us/2.11.0/lib", "/av");
@@ -19,6 +20,7 @@ function App() {
 
   const [triedOpeningZoom, setTriedOpeningZoom] = useState(false);
   const [meetingInfo, setMeetingInfo] = useState(null);
+  const [error, setError] = useState(null);
 
   function getSignature(m, p, n) {
     const iat = Math.round(new Date().getTime() / 1000) - 30;
@@ -49,15 +51,30 @@ function App() {
     ZoomMtg.init({
       leaveUrl: leaveUrl,
       success: (success) => {
-        console.log(success);
-
         ZoomMtg.join({
           signature: s,
           sdkKey: sdkKey,
           meetingNumber: m,
           passWord: p,
           userName: n,
+          userInfo: {
+            customData: {
+              phone: String(meetingInfo?.phone),
+            },
+          },
           success: (success) => {
+            try {
+              api.post("v2/chroniccare/sns-event", {
+                eventType: "ZOOM_WEBINAR_ATTENDANCE",
+                attributes: {
+                  phoneNumber: String(meetingInfo?.phone),
+                  time: Date.now(),
+                  meetingNumber: m,
+                  userName: n,
+                },
+              });
+            } catch {}
+
             console.log(success);
           },
           error: (error) => {
@@ -74,14 +91,18 @@ function App() {
   const handleJoinWithZoomApp = (meetingNumber, meetingPassword, name) => {
     const userAgent = navigator.userAgent.toLowerCase();
     if (userAgent.indexOf("android") > -1) {
-      window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0`;
+      window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0${
+        name ? `&uname=${name}` : ""
+      }`;
       // window.location.href = `intent://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}#Intent;scheme=zoommtg;package=us.zoom.videomeetings;end`;
 
       setTimeout(function () {
         setTriedOpeningZoom(true);
       }, 2000);
     } else if (userAgent.indexOf("iphone") > -1) {
-      window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0`;
+      window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0${
+        name ? `&uname=${name}` : ""
+      }`;
       setTimeout(function () {
         setTriedOpeningZoom(true);
       }, 2000);
@@ -104,7 +125,17 @@ function App() {
   const handleJoinMeeting = () => {
     if (!meetingInfo) return;
 
+    if (!meetingInfo.n) {
+      setError("Please Enter your name");
+      return;
+    }
+
     getSignature(meetingInfo.m, meetingInfo.p, meetingInfo.n);
+  };
+
+  const nameChange = (event) => {
+    setError("");
+    setMeetingInfo((prev) => ({ ...prev, n: event.target.value }));
   };
 
   return (
@@ -117,20 +148,28 @@ function App() {
           alignItems: "center",
           width: "100vw",
           height: "100vh",
-          backgroundColor: "rgba(255, 255, 255)",
-          color: "black",
+          color: "white",
           gap: "1rem",
           padding: "1rem",
           textAlign: "center",
         }}
       >
+        <img src="/logos/white-logo.svg" />
+        <img src="/logos/text-logo-light.svg" />
+        <div className="name-input">
+          {/* <label htmlFor="name">Your Name</label> */}
+          <input
+            id="name"
+            placeholder="Your Name"
+            value={meetingInfo?.n}
+            onChange={nameChange}
+          />
+          {error && <span className="error-msg">{error}</span>}
+        </div>
         {triedOpeningZoom && (
-          <>
-            <h1>Sugarfit Webinar!</h1>
-            <button onClick={handleJoinMeeting} className="btn-zoom-demo">
-              Join Here!
-            </button>
-          </>
+          <button onClick={handleJoinMeeting} className="btn-zoom-demo">
+            Join Webinar
+          </button>
         )}
       </main>
     </div>
