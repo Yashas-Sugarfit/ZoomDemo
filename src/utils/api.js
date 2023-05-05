@@ -26,7 +26,7 @@ const constructHeaders = () => {
     osName: "browser",
     appVersion: 7,
     deviceId: "browser",
-    // browsername: getBrowserNameHeaderValue(),
+    browsername: "web",
   };
 
   if (typeof window !== "undefined" && window["cfat"]) {
