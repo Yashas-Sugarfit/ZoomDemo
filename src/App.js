@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ReactGA from "react-ga";
+// import ReactGA from "react-ga";
 
 import "./App.css";
 import { ZoomMtg } from "@zoomus/websdk";
@@ -14,7 +14,16 @@ ZoomMtg.prepareWebSDK();
 ZoomMtg.i18n.load("en-US");
 ZoomMtg.i18n.reload("en-US");
 
-ReactGA.initialize("G-68RPMKVD2T");
+// ReactGA.initialize("G-68RPMKVD2T");
+
+const GA = (...args) => {
+  if (typeof window !== "undefined") {
+    console.log("gtag");
+    return window.gtag(...args);
+  } else {
+    return (...args) => {};
+  }
+};
 
 function App() {
   const sdkKey = process.env.REACT_APP_ZOOM_MEETING_SDK_KEY;
@@ -26,10 +35,17 @@ function App() {
   const [error, setError] = useState(null);
 
   function getSignature(m, p, n, phone) {
-    ReactGA.event({
-      category: "JOIN_WEBINAR",
-      action: "Getting Signature",
+    GA("event", "JOIN_WEBINAR", {
+      app_name: "zoom_webinar",
+      user_name: `${n}`,
+      user_phone: `${phone}`,
+      meeting_id: `${m}`,
+      user_action: "Getting Signature",
     });
+    // ReactGA.event({
+    //   category: "JOIN_WEBINAR",
+    //   action: "Getting Signature",
+    // });
 
     const iat = Math.round(new Date().getTime() / 1000) - 30;
     const exp = iat + 60 * 60 * 2;
@@ -56,10 +72,18 @@ function App() {
   function startMeeting(s, m, p, n, phone) {
     document.getElementById("zmmtg-root").style.display = "block";
 
-    ReactGA.event({
-      category: "JOIN_WEBINAR",
-      action: "Starting the Zoom meet",
+    GA("event", "JOIN_WEBINAR", {
+      app_name: "zoom_webinar",
+      user_name: `${n}`,
+      user_phone: `${phone}`,
+      meeting_id: `${m}`,
+      user_action: "Starting the Zoom meet",
     });
+
+    // ReactGA.event({
+    //   category: "JOIN_WEBINAR",
+    //   action: "Starting the Zoom meet",
+    // });
 
     ZoomMtg.init({
       leaveUrl: leaveUrl,
@@ -72,10 +96,17 @@ function App() {
           userName: n,
           success: (success) => {
             try {
-              ReactGA.event({
-                category: "JOIN_WEBINAR",
-                action: "Joined the Zoom meet",
+              GA("event", "ZOOM_WEBINAR_ATTENDANCE", {
+                app_name: "zoom_webinar",
+                user_name: `${n}`,
+                user_phone: `${phone}`,
+                meeting_id: `${m}`,
+                user_action: "Joined the Zoom meet",
               });
+              // ReactGA.event({
+              //   category: "ZOOM_WEBINAR_ATTENDANCE",
+              //   action: "Joined the Zoom meet",
+              // });
               api.post("v2/chroniccare/sns-event", {
                 eventType: "ZOOM_WEBINAR_ATTENDANCE",
                 attributes: {
@@ -91,19 +122,27 @@ function App() {
           },
           error: (error) => {
             console.log(error);
-            ReactGA.exception({
+            GA("event", "exception", {
               description: `Failed to Join Meet: ${JSON.stringify(error)} `,
               fatal: true,
             });
+            // ReactGA.exception({
+            //   description: `Failed to Join Meet: ${JSON.stringify(error)} `,
+            //   fatal: true,
+            // });
           },
         });
       },
       error: (error) => {
         console.log(error);
-        ReactGA.exception({
+        GA("event", "exception", {
           description: `Failed to Init Meet: ${JSON.stringify(error)} `,
           fatal: true,
         });
+        // ReactGA.exception({
+        //   description: `Failed to Init Meet: ${JSON.stringify(error)} `,
+        //   fatal: true,
+        // });
       },
     });
   }
@@ -120,10 +159,18 @@ function App() {
         name ? `&uname=${name}` : ""
       }`;
       // window.location.href = `intent://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}#Intent;scheme=zoommtg;package=us.zoom.videomeetings;end`;
-      ReactGA.event({
-        category: "JOIN_WEBINAR_ANDROID",
-        action: "Tried joining in Android",
+      GA("event", "JOIN_WEBINAR_ANDROID", {
+        app_name: "zoom_webinar",
+        user_name: `${name}`,
+        user_phone: `${phone}`,
+        meeting_id: `${meetingNumber}`,
+        user_action: "Tried joining in Android",
       });
+
+      // ReactGA.event({
+      //   category: "JOIN_WEBINAR_ANDROID",
+      //   action: "Tried joining in Android",
+      // });
 
       setTimeout(function () {
         setTriedOpeningZoom(true);
@@ -133,10 +180,18 @@ function App() {
         name ? `&uname=${name}` : ""
       }`;
 
-      ReactGA.event({
-        category: "JOIN_WEBINAR_IOS",
-        action: "Tried joining in IOS",
+      GA("event", "JOIN_WEBINAR_IOS", {
+        app_name: "zoom_webinar",
+        user_name: `${name}`,
+        user_phone: `${phone}`,
+        meeting_id: `${meetingNumber}`,
+        user_action: "Tried joining in IOS",
       });
+
+      // ReactGA.event({
+      //   category: "JOIN_WEBINAR_IOS",
+      //   action: "Tried joining in IOS",
+      // });
       setTimeout(function () {
         setTriedOpeningZoom(true);
       }, 2000);
@@ -145,18 +200,23 @@ function App() {
       // window.location.href = `https://zoom.us/wc/${meetingNumber}/join?prefer=1&pwd=${meetingPassword}`;
       // Join meeting only if name is provided
       setTriedOpeningZoom(true);
-      name &&
-        ReactGA.event({
-          category: "JOIN_WEBINAR_WEB",
-          action: "Joining Webinar on browser",
-        });
+      GA("event", "JOIN_WEBINAR_WEB", {
+        app_name: "zoom_webinar",
+        user_name: `${name}`,
+        user_phone: `${phone}`,
+        meeting_id: `${meetingNumber}`,
+        user_action: "Joining Webinar on browser",
+      });
+      // name &&
+      //   ReactGA.event({
+      //     category: "JOIN_WEBINAR_WEB",
+      //     action: "Joining Webinar on browser",
+      //   });
       name && getSignature(meetingNumber, meetingPassword, name, phone);
     }
   };
 
   useEffect(() => {
-    ReactGA.pageview(window.location.pathname + window.location.search);
-
     let meetingArgs = Object.fromEntries(
       new URLSearchParams(window.location.search)
     );
@@ -175,17 +235,31 @@ function App() {
 
     if (!meetingInfo.n) {
       setError("Please Enter your name");
-      ReactGA.event({
-        category: "MISSED_NAME_INPUT",
-        action: "Missed Name Input",
+
+      GA("event", "MISSED_NAME_INPUT", {
+        app_name: "zoom_webinar",
+        meeting_id: `${meetingInfo.m}`,
+        user_action: "Missed Name Input",
       });
+      // ReactGA.event({
+      //   category: "MISSED_NAME_INPUT",
+      //   action: "Missed Name Input",
+      // });
       return;
     }
 
-    ReactGA.event({
-      category: "JOIN_WEBINAR_CTA",
-      action: "Joining Webinar on browser",
+    GA("event", "JOIN_WEBINAR_CTA", {
+      app_name: "zoom_webinar",
+      user_name: `${meetingInfo.n}`,
+      user_phone: `${meetingInfo.phone}`,
+      meeting_id: `${meetingInfo.m}`,
+      user_action: "Joining Webinar on browser",
     });
+
+    // ReactGA.event({
+    //   category: "JOIN_WEBINAR_CTA",
+    //   action: "Joining Webinar on browser",
+    // });
 
     getSignature(meetingInfo.m, meetingInfo.p, meetingInfo.n);
   };
