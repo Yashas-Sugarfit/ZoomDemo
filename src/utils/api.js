@@ -27,6 +27,7 @@ const constructHeaders = () => {
     appVersion: 7,
     deviceId: "browser",
     browsername: "web",
+    origin: "https://webinar.sugarfit.com",
   };
 
   if (typeof window !== "undefined" && window["cfat"]) {

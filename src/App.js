@@ -108,7 +108,7 @@ function App() {
               //   action: "Joined the Zoom meet",
               // });
               api.post("v2/chroniccare/sns-event", {
-                eventType: "ZOOM_WEBINAR_ATTENDANCE",
+                eventType: "WEBINAR_ATTENDANCE",
                 attributes: {
                   phoneNumber: phone,
                   time: Date.now(),
