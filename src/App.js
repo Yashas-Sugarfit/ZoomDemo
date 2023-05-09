@@ -116,6 +116,7 @@ function App() {
                   },
                 },
                 {
+                  withCredentials: true,
                   headers: {
                     apiKey: getApikey(),
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
