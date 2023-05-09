@@ -13,7 +13,7 @@ const createURI = (fragment) => {
   return url.href;
 };
 
-const getApikey = () => {
+export const getApikey = () => {
   return process.env.REACT_APP_PUBLIC_API_KEY;
 };
 
@@ -54,7 +54,7 @@ export default {
       method: "POST",
       headers: { ...constructHeaders(), ...headers },
       body: JSON.stringify(body),
-      credentials: "include",
+      // credentials: "include",
       mode: "cors",
     })
       .then(checkStatus)

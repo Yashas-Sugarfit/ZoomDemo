@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 import "./App.css";
 import { ZoomMtg } from "@zoomus/websdk";
-import api from "./utils/api";
+import api, { getApikey } from "./utils/api";
 const KJUR = require("jsrsasign");
 
 ZoomMtg.setZoomJSLib("https://source.zoom.us/2.11.0/lib", "/av");
@@ -107,15 +107,44 @@ function App() {
               //   category: "ZOOM_WEBINAR_ATTENDANCE",
               //   action: "Joined the Zoom meet",
               // });
-              api.post("v2/chroniccare/sns-event", {
-                eventType: "WEBINAR_ATTENDANCE",
-                attributes: {
-                  phoneNumber: phone,
-                  time: Date.now(),
-                  meetingNumber: m,
-                  userName: n,
-                },
-              });
+              // api.post(
+              //   "v2/chroniccare/sns-event",
+              // {
+              //   eventType: "WEBINAR_ATTENDANCE",
+              //   attributes: {
+              //     phoneNumber: phone,
+              //     time: Date.now(),
+              //     meetingNumber: m,
+              //     userName: n,
+              //   },
+              // },
+              //   { mode: "no-cors" }
+              // );
+              fetch(
+                `${process.env.REACT_APP_PUBLIC_API_URL}v2/chroniccare/sns-event`,
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    eventType: "WEBINAR_ATTENDANCE",
+                    attributes: {
+                      phoneNumber: phone,
+                      time: Date.now(),
+                      meetingNumber: m,
+                      userName: n,
+                    },
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    apiKey: getApikey(),
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    osName: "browser",
+                    appVersion: 7,
+                    deviceId: "browser",
+                    browsername: "web",
+                  },
+                }
+              );
             } catch {}
 
             console.log(success);
