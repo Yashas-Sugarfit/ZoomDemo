@@ -104,25 +104,30 @@ function App() {
                 meeting_id: `${m}`,
                 user_action: "Joined the Zoom meet",
               });
-              axios.post(
+              fetch(
                 `${process.env.REACT_APP_PUBLIC_API_URL}v2/chroniccare/sns-event`,
                 {
-                  eventType: "WEBINAR_ATTENDANCE",
-                  attributes: {
-                    phoneNumber: phone,
-                    time: Date.now(),
-                    meetingNumber: m,
-                    userName: n,
-                  },
-                },
-                {
-                  withCredentials: true,
+                  method: "POST",
+                  mode: "no-cors",
+                  credentials: "include",
+                  body: JSON.stringify({
+                    eventType: "WEBINAR_ATTENDANCE",
+                    attributes: {
+                      phoneNumber: phone,
+                      time: Date.now(),
+                      meetingNumber: m,
+                      userName: n,
+                    },
+                  }),
                   headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
                     apiKey: getApikey(),
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                     osName: "browser",
                     appVersion: 7,
                     deviceId: "browser",
+                    browsername: "web",
                   },
                 }
               );
