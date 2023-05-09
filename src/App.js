@@ -108,7 +108,7 @@ function App() {
                 `${process.env.REACT_APP_PUBLIC_API_URL}v2/chroniccare/sns-event`,
                 {
                   method: "POST",
-                  mode: "no-cors",
+                  mode: "cors",
                   credentials: "include",
                   body: JSON.stringify({
                     eventType: "WEBINAR_ATTENDANCE",
