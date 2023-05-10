@@ -182,6 +182,33 @@ function App() {
         user_action: "Tried joining in Android",
       });
 
+      fetch(`${process.env.REACT_APP_PUBLIC_API_URL}v2/chroniccare/sns-event`, {
+        method: "POST",
+        mode: "cors",
+        credentials: "include",
+        body: JSON.stringify({
+          eventType: "WEBINAR_ATTENDANCE",
+          attributes: {
+            phoneNumber: phone,
+            time: Date.now(),
+            meetingNumber,
+            userName: name,
+            event: "JOIN_WEBINAR_ANDROID",
+            userAction: "Tried joining in Android",
+          },
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          apiKey: getApikey(),
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          osName: "browser",
+          appVersion: 7,
+          deviceId: "browser",
+          browsername: "web",
+        },
+      });
+
       // ReactGA.event({
       //   category: "JOIN_WEBINAR_ANDROID",
       //   action: "Tried joining in Android",
@@ -201,6 +228,33 @@ function App() {
         user_phone: `${phone}`,
         meeting_id: `${meetingNumber}`,
         user_action: "Tried joining in IOS",
+      });
+
+      fetch(`${process.env.REACT_APP_PUBLIC_API_URL}v2/chroniccare/sns-event`, {
+        method: "POST",
+        mode: "cors",
+        credentials: "include",
+        body: JSON.stringify({
+          eventType: "WEBINAR_ATTENDANCE",
+          attributes: {
+            phoneNumber: phone,
+            time: Date.now(),
+            meetingNumber,
+            userName: name,
+            event: "JOIN_WEBINAR_IOS",
+            userAction: "Tried joining in IOS",
+          },
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          apiKey: getApikey(),
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          osName: "browser",
+          appVersion: 7,
+          deviceId: "browser",
+          browsername: "web",
+        },
       });
 
       // ReactGA.event({
