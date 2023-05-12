@@ -330,7 +330,7 @@ function App() {
     //   action: "Joining Webinar on browser",
     // });
 
-    getSignature(meetingInfo.m, meetingInfo.p, meetingInfo.n);
+    getSignature(meetingInfo.m, meetingInfo.p, meetingInfo.n, meetingInfo.phone);
   };
 
   const nameChange = (event) => {
