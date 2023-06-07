@@ -267,6 +267,9 @@ function App() {
     } else {
       // Fallback to the Zoom Web SDK to join the meeting in the browser
       // window.location.href = `https://zoom.us/wc/${meetingNumber}/join?prefer=1&pwd=${meetingPassword}`;
+      window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0${
+        name ? `&uname=${name}` : ""
+      }`;
       // Join meeting only if name is provided
       setTriedOpeningZoom(true);
       GA("event", "JOIN_WEBINAR_WEB", {
@@ -330,7 +333,12 @@ function App() {
     //   action: "Joining Webinar on browser",
     // });
 
-    getSignature(meetingInfo.m, meetingInfo.p, meetingInfo.n, meetingInfo.phone);
+    getSignature(
+      meetingInfo.m,
+      meetingInfo.p,
+      meetingInfo.n,
+      meetingInfo.phone
+    );
   };
 
   const nameChange = (event) => {
@@ -356,6 +364,7 @@ function App() {
       >
         <img src="/logos/white-logo.svg" />
         <img src="/logos/text-logo-light.svg" />
+        <h2>Diabetes Reversal Session</h2>
         <div className="name-input">
           {/* <label htmlFor="name">Your Name</label> */}
           <input
