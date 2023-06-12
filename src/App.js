@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from "react";
-// import ReactGA from "react-ga";
 
 import "./App.css";
-import { ZoomMtg } from "@zoomus/websdk";
-import api, { getApikey } from "./utils/api";
-import axios from "axios";
+// import { ZoomMtg } from "@zoomus/websdk";
+import { getApikey } from "./utils/api";
 const KJUR = require("jsrsasign");
 
-ZoomMtg.setZoomJSLib("https://source.zoom.us/2.11.0/lib", "/av");
+window.ZoomMtg.setZoomJSLib("https://source.zoom.us/2.11.0/lib", "/av");
 
-ZoomMtg.preLoadWasm();
-ZoomMtg.prepareWebSDK();
+window.ZoomMtg.preLoadWasm();
+window.ZoomMtg.prepareWebSDK();
 // loads language files, also passes any error messages to the ui
-ZoomMtg.i18n.load("en-US");
-ZoomMtg.i18n.reload("en-US");
-
-// ReactGA.initialize("G-68RPMKVD2T");
+window.ZoomMtg.i18n.load("en-US");
+window.ZoomMtg.i18n.reload("en-US");
 
 const GA = (...args) => {
   if (typeof window !== "undefined") {
@@ -86,10 +82,10 @@ function App() {
     //   action: "Starting the Zoom meet",
     // });
 
-    ZoomMtg.init({
+    window.ZoomMtg.init({
       leaveUrl: leaveUrl,
       success: (success) => {
-        ZoomMtg.join({
+        window.ZoomMtg.join({
           signature: s,
           sdkKey: sdkKey,
           meetingNumber: m,
@@ -173,7 +169,7 @@ function App() {
       window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0${
         name ? `&uname=${name}` : ""
       }`;
-      // window.location.href = `intent://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}#Intent;scheme=zoommtg;package=us.zoom.videomeetings;end`;
+      // window.location.href = `intent://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}#Intent;scheme=window.zoommtg;package=us.zoom.videomeetings;end`;
       GA("event", "JOIN_WEBINAR_ANDROID", {
         app_name: "zoom_webinar",
         user_name: `${name}`,

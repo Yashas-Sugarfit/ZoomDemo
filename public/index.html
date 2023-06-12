@@ -39,9 +39,9 @@
     <link type="text/css" rel="stylesheet" href="https://source.zoom.us/2.11.0/css/bootstrap.css" />
     <link type="text/css" rel="stylesheet" href="https://source.zoom.us/2.11.0/css/react-select.css" />
 
-    <!-- Origin Trials to enable Gallery View in Chrome/Edge -->
-    <!-- More Info: https://developers.zoom.us/docs/meeting-sdk/web/gallery-view/ -->
-    <!-- SharedArrayBuffers in non-isolated pages on Desktop platforms -->
+
+    <!-- CDN for component view -->
+    <!-- <script src="https://source.zoom.us/zoom-meeting-embedded-2.11.0.min.js"></script> -->
     <meta http-equiv="origin-trial" content="">
   </head>
   <body>
@@ -58,5 +58,16 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+
+    <script src="https://source.zoom.us/2.11.0/lib/vendor/react.min.js"></script>
+    <script src="https://source.zoom.us/2.11.0/lib/vendor/react-dom.min.js"></script>
+    <script src="https://source.zoom.us/2.11.0/lib/vendor/redux.min.js"></script>
+    <script src="https://source.zoom.us/2.11.0/lib/vendor/redux-thunk.min.js"></script>
+    <script src="https://source.zoom.us/2.11.0/lib/vendor/lodash.min.js"></script>
+
+    <!-- Choose between the client view or component view: -->
+
+    <!-- CDN for client view -->
+    <script src="https://source.zoom.us/zoom-meeting-2.11.0.min.js"></script>
   </body>
 </html>
