@@ -6,8 +6,7 @@ const Button = (buttonProps) => {
 
   return (
     <button className="btn-zoom-demo" {...rest}>
-      {children}
-      {loading && <img src="/loading.svg" />}
+      {loading ? <img src="/loading.svg" /> : children}
     </button>
   );
 };
