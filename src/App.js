@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Button from "./atoms/Button/Button";
 
 import "./App.css";
 // import { ZoomMtg } from "@zoomus/websdk";
@@ -164,124 +165,7 @@ function App() {
     name,
     phone
   ) => {
-    const userAgent = navigator.userAgent.toLowerCase();
-    if (userAgent.indexOf("android") > -1) {
-      window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0${
-        name ? `&uname=${name}` : ""
-      }`;
-      // window.location.href = `intent://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}#Intent;scheme=window.zoommtg;package=us.zoom.videomeetings;end`;
-      GA("event", "JOIN_WEBINAR_ANDROID", {
-        app_name: "zoom_webinar",
-        user_name: `${name}`,
-        user_phone: `${phone}`,
-        meeting_id: `${meetingNumber}`,
-        user_action: "Tried joining in Android",
-      });
-
-      fetch(`${process.env.REACT_APP_PUBLIC_API_URL}v2/chroniccare/sns-event`, {
-        method: "POST",
-        mode: "cors",
-        credentials: "include",
-        body: JSON.stringify({
-          eventType: "WEBINAR_ATTENDANCE",
-          attributes: {
-            phoneNumber: phone,
-            time: Date.now(),
-            meetingNumber,
-            userName: name,
-            event: "JOIN_WEBINAR_ANDROID",
-            userAction: "Tried joining in Android",
-          },
-        }),
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          apiKey: getApikey(),
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          osName: "browser",
-          appVersion: 7,
-          deviceId: "browser",
-          browsername: "web",
-        },
-      });
-
-      // ReactGA.event({
-      //   category: "JOIN_WEBINAR_ANDROID",
-      //   action: "Tried joining in Android",
-      // });
-
-      setTimeout(function () {
-        setTriedOpeningZoom(true);
-      }, 2000);
-    } else if (userAgent.indexOf("iphone") > -1) {
-      window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0${
-        name ? `&uname=${name}` : ""
-      }`;
-
-      GA("event", "JOIN_WEBINAR_IOS", {
-        app_name: "zoom_webinar",
-        user_name: `${name}`,
-        user_phone: `${phone}`,
-        meeting_id: `${meetingNumber}`,
-        user_action: "Tried joining in IOS",
-      });
-
-      fetch(`${process.env.REACT_APP_PUBLIC_API_URL}v2/chroniccare/sns-event`, {
-        method: "POST",
-        mode: "cors",
-        credentials: "include",
-        body: JSON.stringify({
-          eventType: "WEBINAR_ATTENDANCE",
-          attributes: {
-            phoneNumber: phone,
-            time: Date.now(),
-            meetingNumber,
-            userName: name,
-            event: "JOIN_WEBINAR_IOS",
-            userAction: "Tried joining in IOS",
-          },
-        }),
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          apiKey: getApikey(),
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          osName: "browser",
-          appVersion: 7,
-          deviceId: "browser",
-          browsername: "web",
-        },
-      });
-
-      // ReactGA.event({
-      //   category: "JOIN_WEBINAR_IOS",
-      //   action: "Tried joining in IOS",
-      // });
-      setTimeout(function () {
-        setTriedOpeningZoom(true);
-      }, 2000);
-    } else {
-      // Fallback to the Zoom Web SDK to join the meeting in the browser
-      // window.location.href = `https://zoom.us/wc/${meetingNumber}/join?prefer=1&pwd=${meetingPassword}`;
-      window.location.href = `zoomus://zoom.us/join?action=join&confno=${meetingNumber}&pwd=${meetingPassword}&zc=0${
-        name ? `&uname=${name}` : ""
-      }`;
-      // Join meeting only if name is provided
-      setTriedOpeningZoom(true);
-      GA("event", "JOIN_WEBINAR_WEB", {
-        app_name: "zoom_webinar",
-        user_name: `${name}`,
-        user_phone: `${phone}`,
-        meeting_id: `${meetingNumber}`,
-        user_action: "Joining Webinar on browser",
-      });
-      // name &&
-      //   ReactGA.event({
-      //     category: "JOIN_WEBINAR_WEB",
-      //     action: "Joining Webinar on browser",
-      //   });
-      name && getSignature(meetingNumber, meetingPassword, name, phone);
-    }
+    name && getSignature(meetingNumber, meetingPassword, name, phone);
   };
 
   useEffect(() => {
@@ -343,41 +227,19 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <main
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100vw",
-          height: "100vh",
-          color: "white",
-          gap: "1rem",
-          padding: "1rem",
-          textAlign: "center",
-        }}
-      >
-        <img src="/logos/white-logo.svg" />
-        <img src="/logos/text-logo-light.svg" />
-        <h2>Diabetes Reversal Session</h2>
-        <div className="name-input">
-          {/* <label htmlFor="name">Your Name</label> */}
-          <input
-            id="name"
-            placeholder="Your Name"
-            value={meetingInfo?.n}
-            onChange={nameChange}
-          />
-          {error && <span className="error-msg">{error}</span>}
-        </div>
-        {triedOpeningZoom && (
-          <button onClick={handleJoinMeeting} className="btn-zoom-demo">
-            Join Webinar
-          </button>
-        )}
-      </main>
-    </div>
+    <>
+      <div className="name-input">
+        {/* <label htmlFor="name">Your Name</label> */}
+        <input
+          id="name"
+          placeholder="Your Name"
+          value={meetingInfo?.n}
+          onChange={nameChange}
+        />
+        {error && <span className="error-msg">{error}</span>}
+      </div>
+      <Button onClick={handleJoinMeeting}>Join Webinar</Button>
+    </>
   );
 }
 
