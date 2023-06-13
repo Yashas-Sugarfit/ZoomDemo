@@ -6,13 +6,26 @@ import "./App.css";
 import { getApikey } from "./utils/api";
 const KJUR = require("jsrsasign");
 
-window.ZoomMtg.setZoomJSLib("https://source.zoom.us/2.11.0/lib", "/av");
+const OnZoomMount = () => {
+  window.ZoomMtg.setZoomJSLib("https://source.zoom.us/2.11.0/lib", "/av");
 
-window.ZoomMtg.preLoadWasm();
-window.ZoomMtg.prepareWebSDK();
-// loads language files, also passes any error messages to the ui
-window.ZoomMtg.i18n.load("en-US");
-window.ZoomMtg.i18n.reload("en-US");
+  window.ZoomMtg.preLoadWasm();
+  window.ZoomMtg.prepareWebSDK();
+  // loads language files, also passes any error messages to the ui
+  window.ZoomMtg.i18n.load("en-US");
+  window.ZoomMtg.i18n.reload("en-US");
+};
+
+const mountZoom = () => {
+  const script = document.createElement("script");
+  script.src = "https://source.zoom.us/zoom-meeting-2.11.0.min.js";
+  script.async = true;
+  document.body.appendChild(script);
+
+  return new Promise(function (resolve, reject) {
+    script.onload = resolve;
+  });
+};
 
 const GA = (...args) => {
   if (typeof window !== "undefined") {
@@ -28,7 +41,7 @@ function App() {
   const sdks = process.env.REACT_APP_ZOOM_MEETING_SDK_SECRET;
   const leaveUrl = "https://www.sugarfit.com/";
 
-  const [triedOpeningZoom, setTriedOpeningZoom] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [meetingInfo, setMeetingInfo] = useState(null);
   const [error, setError] = useState(null);
 
@@ -159,27 +172,20 @@ function App() {
     });
   }
 
-  const handleJoinWithZoomApp = (
-    meetingNumber,
-    meetingPassword,
-    name,
-    phone
-  ) => {
-    name && getSignature(meetingNumber, meetingPassword, name, phone);
-  };
-
   useEffect(() => {
     let meetingArgs = Object.fromEntries(
       new URLSearchParams(window.location.search)
     );
     setMeetingInfo(meetingArgs);
-    meetingArgs.p &&
-      handleJoinWithZoomApp(
-        meetingArgs.m,
-        meetingArgs.p,
-        meetingArgs.n,
-        meetingArgs.phone
-      );
+
+    const loadZoom = async () => {
+      setLoading(true);
+      await mountZoom();
+      OnZoomMount();
+      setLoading(false);
+    };
+
+    loadZoom();
   }, []);
 
   const handleJoinMeeting = () => {
@@ -238,7 +244,9 @@ function App() {
         />
         {error && <span className="error-msg">{error}</span>}
       </div>
-      <Button onClick={handleJoinMeeting}>Join Webinar</Button>
+      <Button loading={loading} onClick={handleJoinMeeting}>
+        Join Webinar
+      </Button>
     </>
   );
 }
